@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>হোম</title>
+<style>
+  :root { --bg:#f2f2f7; --card:#fff; --ink:#000; --sub:#8e8e93; --blue:#007aff; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#000; --card:#1c1c1e; --ink:#fff; } }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font: 16px/1.4 -apple-system, system-ui, "Noto Sans Bengali", sans-serif;
+    padding: max(48px, env(safe-area-inset-top)) 16px 32px; }
+  h1 { font-size: 32px; margin: 0 0 4px; letter-spacing: -.5px; }
+  p.sub { margin: 0 0 24px; color: var(--sub); }
+  form { display:flex; gap:8px; margin-bottom: 24px; }
+  input { flex:1; border:0; border-radius:12px; padding:14px 16px; font-size:16px;
+    background:var(--card); color:var(--ink); outline:none; }
+  button { border:0; border-radius:12px; padding:0 18px; font-size:16px; font-weight:600;
+    background:var(--blue); color:#fff; }
+  .grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:16px 8px; }
+  .grid a { text-decoration:none; color:var(--ink); text-align:center; font-size:12px; }
+  .grid i { display:flex; align-items:center; justify-content:center; width:60px; height:60px;
+    margin:0 auto 6px; border-radius:15px; font-style:normal; font-size:28px; color:#fff; }
+</style>
+</head>
+<body>
+  <h1>স্বাগতম</h1>
+  <p class="sub">এটা অ্যাপের ভেতরের index.html — আপনার নিজের পেজ দিয়ে বদলে নিন।</p>
+
+  <form onsubmit="go(event)">
+    <input id="q" placeholder="সার্চ করুন বা ঠিকানা লিখুন" autocomplete="off">
+    <button>যান</button>
+  </form>
+
+  <div class="grid">
+    <a href="https://www.google.com"><i style="background:#4285f4">G</i>Google</a>
+    <a href="https://www.youtube.com"><i style="background:#ff3b30">▶</i>YouTube</a>
+    <a href="https://www.facebook.com"><i style="background:#1877f2">f</i>Facebook</a>
+    <a href="https://www.tiktok.com"><i style="background:#111">♪</i>TikTok</a>
+  </div>
+
+<script>
+  function go(e) {
+    e.preventDefault();
+    var t = document.getElementById('q').value.trim();
+    if (!t) return;
+    location.href = /^https?:\/\//.test(t) ? t
+      : (t.indexOf(' ') < 0 && t.indexOf('.') > 0) ? 'https://' + t
+      : 'https://www.google.com/search?q=' + encodeURIComponent(t);
+  }
+</script>
+</body>
+  </html>
