@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" id="themeColor" content="#f6f8fc">
+  <title>Vaelo</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --base: #f6f8fc;
+      --glow1: rgba(212, 230, 255, 0.95);
+      --glow2: rgba(236, 220, 255, 0.9);
+      --grad-a: #2ab2f0;
+      --grad-b: #2a7ff0;
+      --grad-c: #8b3df0;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-line: rgba(10, 30, 60, 0.07);
+      --ink: #0c1322;
+      --muted: #7d8697;
+      --label: #8a93a6;
+      --accent: #2a7ff0;
+      --soft: rgba(10, 30, 60, 0.05);
+      --popup: rgba(255, 255, 255, 0.9);
+      --popup-line: rgba(10, 30, 60, 0.08);
+      --sheet: #ffffff;
+      --shadow: rgba(20, 40, 80, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --base: #0b0d12;
+        --glow1: rgba(29, 78, 143, 0.85);
+        --glow2: rgba(90, 42, 158, 0.75);
+        --card: rgba(255, 255, 255, 0.055);
+        --card-line: rgba(255, 255, 255, 0.09);
+        --ink: #f2f4f8;
+        --muted: #8b93a5;
+        --label: #737c8f;
+        --accent: #33a8f5;
+        --soft: rgba(255, 255, 255, 0.06);
+        --popup: rgba(25, 28, 36, 0.92);
+        --popup-line: rgba(255, 255, 255, 0.1);
+        --sheet: #15171e;
+        --shadow: rgba(0, 0, 0, 0.55);
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--base);
+      background-image:
+        radial-gradient(760px 420px at 12% -6%, var(--glow1) 0%, transparent 55%),
+        radial-gradient(640px 420px at 108% 4%, var(--glow2) 0%, transparent 48%);
+      background-attachment: fixed;
+      color: var(--ink);
+    }
+
+    .app {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      max-width: 620px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding:
+        max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+        max(18px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+
+    .topbar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 1.12rem;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .brand-ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--grad-a), var(--grad-b) 55%, var(--grad-c));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 6px 16px rgba(42, 127, 240, 0.38);
+    }
+
+    .dots {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .dots:active { background: var(--soft); }
+
+    .hero { margin-top: 30px; padding: 0 2px; }
+
+    .clock {
+      font-size: clamp(2.5rem, 12.5vw, 3.7rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sub {
+      margin-top: 9px;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .sub .sep { opacity: 0.45; }
+    .sub i { color: #ffac33; margin-right: 6px; }
+
+    .search-wrap { position: relative; margin-top: 24px; }
+    .search-row { display: flex; gap: 10px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px var(--shadow);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+    }
+
+    .search-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 17px;
+      min-width: 0;
+      transition: border-color 0.2s;
+    }
+
+    .search-card:focus-within { border-color: var(--accent); }
+
+    .search-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      color: var(--ink);
+      padding: 15px 0;
+    }
+
+    .search-input::placeholder { color: var(--muted); opacity: 0.85; }
+
+    .engine-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 15px;
+      color: var(--ink);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .engine-card .chev { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; }
+    .engine-card.open .chev { transform: rotate(180deg); }
+
+    .popup {
+      position: absolute;
+      z-index: 30;
+      background: var(--popup);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid var(--popup-line);
+      border-radius: 18px;
+      box-shadow: 0 20px 48px var(--shadow);
+      overflow: hidden;
+      display: none;
+    }
+
+    .popup.show { display: block; animation: pop 0.15s ease both; }
+
+    @keyframes pop {
+      from { opacity: 0; transform: translateY(-7px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    #suggest { left: 0; right: 0; top: calc(100% + 9px); }
+
+    .sug-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 17px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .sug-item + .sug-item { border-top: 1px solid var(--card-line); }
+    .sug-item:active { background: var(--soft); }
+    @media (hover: hover) { .sug-item:hover { background: var(--soft); } }
+    .sug-item i { color: var(--muted); font-size: 0.85rem; }
+
+    #engineMenu { right: 0; top: calc(100% + 9px); min-width: 186px; padding: 6px; }
+
+    .eng-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 0.95rem;
+    }
+
+    .eng-item:active { background: var(--soft); }
+    @media (hover: hover) { .eng-item:hover { background: var(--soft); } }
+    .eng-item .tick { color: var(--accent); opacity: 0; }
+    .eng-item.active .tick { opacity: 1; }
+    .eng-item.active { font-weight: 700; color: var(--accent); }
+
+    #appMenu { right: 0; top: calc(100% + 6px); min-width: 196px; padding: 6px; }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 13px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--ink);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .menu-item:active { background: var(--soft); }
+    @media (hover: hover) { .menu-item:hover { background: var(--soft); } }
+    .menu-item .lbl { display: flex; align-items: center; gap: 12px; }
+    .menu-item .lbl i { width: 18px; text-align: center; color: var(--muted); }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .shortcut-card {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: 20px;
+      padding: 15px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      box-shadow: 0 6px 18px var(--shadow);
+      transition: transform 0.18s ease;
+    }
+
+    .shortcut-card:active { transform: scale(0.94); }
+    @media (hover: hover) { .shortcut-card:hover { transform: translateY(-3px); color: var(--ink); } }
+
+    .shortcut-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: var(--soft);
+      border: 1px solid var(--card-line);
+    }
+
+    .icon-youtube { color: #ff0000; }
+    .icon-github { color: var(--ink); }
+    .icon-mail { color: #ea4335; }
+    .icon-tiktok { color: var(--ink); }
+    .icon-x { color: var(--ink); }
+    .icon-facebook { color: #1877f2; }
+    .icon-whatsapp { color: #25d366; }
+    .icon-telegram { color: #26a5e4; }
+
+    .spacer { flex: 1; min-height: 20px; }
+
+    .foot {
+      text-align: center;
+      font-size: 0.74rem;
+      color: var(--label);
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px 0 4px;
+      user-select: none;
+    }
+
+    .sheet-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .sheet-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .sheet {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      background: var(--sheet);
+      border-radius: 26px 26px 0 0;
+      padding: 10px 22px calc(26px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      max-height: 86vh;
+      overflow-y: auto;
+    }
+
+    .sheet-overlay.show .sheet { transform: translateY(0); }
+
+    .grab {
+      width: 38px;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--soft);
+      margin: 0 auto 18px;
+    }
+
+    .about-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+
+    .about-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, var(--grad-a), var(--grad-b) 55%, var(--grad-c));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 10px 24px rgba(90, 60, 230, 0.35);
+    }
+
+    .about-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.4px; }
+    .about-sub { font-size: 0.84rem; color: var(--muted); margin-top: 3px; }
+
+    .about-text {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .about-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      padding: 12px 0;
+      border-top: 1px solid var(--card-line);
+      font-size: 0.92rem;
+    }
+
+    .about-feature i { color: var(--accent); margin-top: 2px; width: 20px; text-align: center; }
+    .about-feature b { font-weight: 600; }
+    .about-feature span { color: var(--muted); font-size: 0.82rem; display: block; margin-top: 2px; }
+
+    .about-foot { margin-top: 20px; text-align: center; font-size: 0.76rem; color: var(--muted); }
+    .about-foot b { color: var(--ink); letter-spacing: 2px; }
+
+    @media (max-width: 380px) {
+      .shortcuts-grid { gap: 9px; }
+      .shortcut-card { padding: 13px 4px; border-radius: 17px; }
+      .shortcut-icon-wrapper { width: 40px; height: 40px; font-size: 1.2rem; }
+      .shortcut-card span { font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-ic"><i class="fa-solid fa-shield-halved"></i></span>
+        Vaelo
+      </div>
+      <button class="dots" id="menuBtn" aria-label="Menu"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+
+      <div class="popup" id="appMenu">
+        <div class="menu-item" id="aboutBtn">
+          <span class="lbl"><i class="fa-solid fa-circle-info"></i> About</span>
+          <i class="fa-solid fa-chevron-right" style="color:var(--muted);font-size:0.8rem;"></i>
+        </div>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="sub">
+        <span><i id="greetingIcon" class="fa-solid fa-sun"></i><span id="greetingText">Good Day</span></span>
+        <span class="sep">|</span>
+        <span id="dateText">-</span>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-row">
+        <form class="card search-card" id="searchForm">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search or type a URL"
+            autocomplete="off"
+            enterkeyhint="go"
+          >
+        </form>
+        <button type="button" class="card engine-card" id="engineBtn">
+          <span id="engineLabel">Google</span>
+          <i class="fa-solid fa-chevron-down chev"></i>
+        </button>
+      </div>
+
+      <div class="popup" id="suggest"></div>
+
+      <div class="popup" id="engineMenu">
+        <div class="eng-item" data-engine="google"><span>Google</span><i class="fa-solid fa-check tick"></i></div>
+        <div class="eng-item" data-engine="duckduckgo"><span>DuckDuckGo</span><i class="fa-solid fa-check tick"></i></div>
+        <div class="eng-item" data-engine="bing"><span>Bing</span><i class="fa-solid fa-check tick"></i></div>
+      </div>
+    </div>
+
+    <div class="shortcuts-grid">
+      <a href="https://www.youtube.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-youtube"><i class="fa-brands fa-youtube"></i></div>
+        <span>YouTube</span>
+      </a>
+      <a href="https://github.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-github"><i class="fa-brands fa-github"></i></div>
+        <span>GitHub</span>
+      </a>
+      <a href="https://mail.google.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-mail"><i class="fa-solid fa-envelope"></i></div>
+        <span>Gmail</span>
+      </a>
+      <a href="https://www.tiktok.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-tiktok"><i class="fa-brands fa-tiktok"></i></div>
+        <span>TikTok</span>
+      </a>
+      <a href="https://x.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-x"><i class="fa-brands fa-x-twitter"></i></div>
+        <span>X</span>
+      </a>
+      <a href="https://www.facebook.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-facebook"><i class="fa-brands fa-facebook-f"></i></div>
+        <span>Facebook</span>
+      </a>
+      <a href="https://web.whatsapp.com" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+        <span>WhatsApp</span>
+      </a>
+      <a href="https://web.telegram.org" class="shortcut-card">
+        <div class="shortcut-icon-wrapper icon-telegram"><i class="fa-brands fa-telegram"></i></div>
+        <span>Telegram</span>
+      </a>
+    </div>
+
+    <div class="spacer"></div>
+    <div class="foot">X ZONE BD</div>
+  </div>
+
+  <div class="sheet-overlay" id="aboutOverlay">
+    <div class="sheet" id="aboutSheet">
+      <div class="grab"></div>
+      <div class="about-head">
+        <div class="about-logo"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+          <div class="about-title">Vaelo</div>
+          <div class="about-sub">Private browsing, your way - v5.6</div>
+        </div>
+      </div>
+      <div class="about-text">
+        Vaelo is a privacy-first browser that controls exactly what every website can learn about your device. Spoof your identity, block trackers, and browse without leaving a fingerprint.
+      </div>
+      <div class="about-feature"><i class="fa-solid fa-user-secret"></i><div><b>Device spoofing</b><span>Send fake or edited device, screen, GPU and locale data</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-shield-halved"></i><div><b>Permission control</b><span>Decide per site what to share: real, fake, or blocked</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-ban"></i><div><b>Ad and tracker blocking</b><span>Blocks over 73,000 known ad, tracker and scam domains</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-fingerprint"></i><div><b>Anti-fingerprint</b><span>Canvas, WebGL and WebRTC protection built in</span></div></div>
+      <div class="about-foot">Developed by <b>X ZONE BD</b></div>
+    </div>
+  </div>
+
+  <script>
+    function isDark() {
+      try {
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch (e) { return false; }
+    }
+
+    function paintThemeColor() {
+      var m = document.getElementById('themeColor');
+      if (m) m.setAttribute('content', isDark() ? '#0b0d12' : '#f6f8fc');
+    }
+    paintThemeColor();
+
+    try {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.addEventListener) mq.addEventListener('change', paintThemeColor);
+      else if (mq.addListener) mq.addListener(paintThemeColor);
+    } catch (e) {}
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function updateClock() {
+      const now = new Date();
+      const h = now.getHours();
+      const text = document.getElementById('greetingText');
+      const icon = document.getElementById('greetingIcon');
+
+      if (h >= 5 && h < 12) {
+        text.textContent = 'Good Morning';
+        icon.className = 'fa-solid fa-cloud-sun';
+      } else if (h >= 12 && h < 17) {
+        text.textContent = 'Good Afternoon';
+        icon.className = 'fa-solid fa-sun';
+      } else if (h >= 17 && h < 21) {
+        text.textContent = 'Good Evening';
+        icon.className = 'fa-solid fa-cloud-moon';
+      } else {
+        text.textContent = 'Good Night';
+        icon.className = 'fa-solid fa-moon';
+      }
+
+      document.getElementById('clock').textContent = pad(h) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+      document.getElementById('dateText').textContent = now.toLocaleDateString('en-US', {
+        weekday: 'long', day: 'numeric', month: 'long'
+      });
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    const menuBtn = document.getElementById('menuBtn');
+    const appMenu = document.getElementById('appMenu');
+
+    menuBtn.addEventListener('click', function () {
+      appMenu.classList.toggle('show');
+    });
+
+    const aboutOverlay = document.getElementById('aboutOverlay');
+    document.getElementById('aboutBtn').addEventListener('click', function () {
+      appMenu.classList.remove('show');
+      aboutOverlay.classList.add('show');
+    });
+    aboutOverlay.addEventListener('click', function (e) {
+      if (e.target === aboutOverlay) aboutOverlay.classList.remove('show');
+    });
+
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('searchInput');
+    const engineBtn = document.getElementById('engineBtn');
+    const engineLabel = document.getElementById('engineLabel');
+    const engineMenu = document.getElementById('engineMenu');
+    const suggest = document.getElementById('suggest');
+
+    const ENGINES = {
+      google: { label: 'Google', url: 'https://www.google.com/search?q=' },
+      duckduckgo: { label: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=' },
+      bing: { label: 'Bing', url: 'https://www.bing.com/search?q=' }
+    };
+
+    let engine = 'google';
+    try {
+      const saved = localStorage.getItem('ghost_engine');
+      if (saved && ENGINES[saved]) engine = saved;
+    } catch (e) {}
+
+    function paintEngine() {
+      engineLabel.textContent = ENGINES[engine].label;
+      engineMenu.querySelectorAll('.eng-item').forEach(function (el) {
+        el.classList.toggle('active', el.getAttribute('data-engine') === engine);
+      });
+    }
+    paintEngine();
+
+    function closeEngine() {
+      engineMenu.classList.remove('show');
+      engineBtn.classList.remove('open');
+    }
+    function hideSuggest() { suggest.classList.remove('show'); }
+
+    engineBtn.addEventListener('click', function () {
+      hideSuggest();
+      const open = engineMenu.classList.toggle('show');
+      engineBtn.classList.toggle('open', open);
+    });
+
+    engineMenu.querySelectorAll('.eng-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        engine = el.getAttribute('data-engine');
+        try { localStorage.setItem('ghost_engine', engine); } catch (e) {}
+        paintEngine();
+        closeEngine();
+        input.focus();
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.search-wrap')) { closeEngine(); hideSuggest(); }
+      if (!e.target.closest('.topbar')) appMenu.classList.remove('show');
+    });
+
+    function runSearch(query) {
+      const q = query.trim();
+      if (!q) return;
+      const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/i;
+      if (urlPattern.test(q)) {
+        window.location.href = /^https?:\/\//i.test(q) ? q : 'https://' + q;
+        return;
+      }
+      window.location.href = ENGINES[engine].url + encodeURIComponent(q);
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      runSearch(input.value);
+    });
+
+    let seq = 0;
+    let timer = null;
+
+    function renderSuggest(list) {
+      if (!list.length) { hideSuggest(); return; }
+      suggest.innerHTML = '';
+      list.slice(0, 7).forEach(function (s) {
+        const row = document.createElement('div');
+        row.className = 'sug-item';
+        row.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i><span></span>';
+        row.querySelector('span').textContent = s;
+        row.addEventListener('click', function () {
+          input.value = s;
+          hideSuggest();
+          runSearch(s);
+        });
+        suggest.appendChild(row);
+      });
+      closeEngine();
+      suggest.classList.add('show');
+    }
+
+    function fetchSuggest(q) {
+      const my = ++seq;
+      fetch('https://duckduckgo.com/ac/?type=list&q=' + encodeURIComponent(q))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (my !== seq) return;
+          let list = [];
+          if (Array.isArray(data) && Array.isArray(data[1])) list = data[1];
+          else if (Array.isArray(data)) list = data.map(function (x) { return x && x.phrase ? x.phrase : x; });
+          renderSuggest(list.filter(function (x) { return typeof x === 'string'; }));
+        })
+        .catch(function () {});
+    }
+
+    input.addEventListener('input', function () {
+      const q = input.value.trim();
+      if (timer) clearTimeout(timer);
+      if (!q) { hideSuggest(); return; }
+      timer = setTimeout(function () { fetchSuggest(q); }, 130);
+    });
+  </script>
+</body>
+</html>
