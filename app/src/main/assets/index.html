@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" id="themeColor" content="#f3f4f7">
+  <title>Vaelo</title>
+  <link rel="stylesheet" href="assets/style/style.css">
+  <link rel="preconnect" href="https://suggestqueries.google.com" crossorigin>
+  <link rel="dns-prefetch" href="https://suggestqueries.google.com">
+  <link rel="stylesheet" href="assets/style/icons.css">
+  <script>
+    (function () {
+      var t = 'light';
+      try {
+        var s = JSON.parse(localStorage.getItem('vaelo_settings') || '{}');
+        t = s.theme;
+        if (t !== 'light' && t !== 'dark') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+      } catch (e) { t = 'light'; }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+  <div id="bgLayer"></div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="Vaelo" class="brand-img" id="brandImg">
+        <span class="brand-fallback" id="brandFallback">Vaelo</span>
+      </div>
+      <button class="dots" id="menuBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <div class="hero">
+      <div class="clock">
+        <span class="clock-main">
+          <span class="dg" id="d0"><span class="dgi">0</span></span><span class="dg" id="d1"><span class="dgi">0</span></span>
+          <span class="cl" aria-hidden="true"></span>
+          <span class="dg" id="d2"><span class="dgi">0</span></span><span class="dg" id="d3"><span class="dgi">0</span></span>
+        </span>
+        <span class="secs"><span class="dg" id="d4"><span class="dgi">0</span></span><span class="dg" id="d5"><span class="dgi">0</span></span></span>
+      </div>
+      <div class="sub">
+        <span><i id="greetingIcon" class="fa-solid fa-sun"></i><span id="greetingText">Good Day</span></span>
+        <span class="sep">|</span>
+        <span id="dateText">-</span>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-row">
+        <div class="card search-open" id="searchOpen" role="button" tabindex="0">
+          <i class="fa-solid fa-magnifying-glass" id="searchOpenIcon"></i>
+          <span class="so-text" id="searchOpenText">Search or type a URL</span>
+          <button type="button" class="mic-btn" id="micHome" aria-label="Voice search"><i class="fa-solid fa-microphone"></i></button>
+        </div>
+        <button type="button" class="card engine-card" id="engineBtn" aria-label="Search engine">
+          <span class="eng-badge" id="engineBadge">G</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sec-card" id="defCard">
+      <div class="sec-title"><span>Quick access</span></div>
+      <div class="tiles" id="defGrid"></div>
+    </div>
+
+    <div class="sec-card" id="cusCard">
+      <div class="sec-title"><span>My shortcuts</span><button type="button" id="cusAdd"></button></div>
+      <div class="tiles" id="grid"></div>
+      <div class="sec-empty hidden" id="cusEmpty">No shortcuts yet<br><button type="button" id="cusEmptyAdd">Add your first shortcut</button></div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+
+  <div class="card-menu" id="cardMenu">
+    <div class="cm-item" data-act="move"><i class="fa-solid fa-arrows-up-down-left-right"></i>Transfer</div>
+    <div class="cm-item" data-act="edit"><i class="fa-solid fa-pen"></i> Edit</div>
+    <div class="cm-item danger" data-act="delete"><i class="fa-solid fa-trash"></i> Delete</div>
+    <div class="cm-item" data-act="hide"><i class="fa-solid fa-eye-slash"></i> Hide</div>
+  </div>
+
+  <div class="move-bar" id="moveBar">
+    <span>Tap a tile to move it there</span>
+    <button type="button" id="moveCancel">Cancel</button>
+  </div>
+
+  <div class="search-page" id="searchPage">
+    <div class="sp-inner">
+      <div class="sp-head">
+        <form class="sp-field" id="spForm">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="spInput"
+            class="sp-input"
+            placeholder="Search or type a URL"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            enterkeyhint="go"
+          >
+          <button type="button" class="sp-clear" id="spClear" aria-label="Clear"><i class="fa-solid fa-xmark"></i></button>
+          <button type="button" class="mic-btn" id="micSearch" aria-label="Voice search"><i class="fa-solid fa-microphone"></i></button>
+        </form>
+        <button type="button" class="sp-engine" id="spEngineBtn" aria-label="Search engine">
+          <span class="eng-badge" id="spEngineBadge">G</span>
+        </button>
+      </div>
+      <div class="sp-list" id="spList"></div>
+    </div>
+  </div>
+
+  <div class="voice idle" id="voice">
+    <button type="button" class="voice-close" id="voiceClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="voice-mic">
+      <div class="voice-pulse"></div>
+      <div class="voice-circle"><i class="fa-solid fa-microphone"></i></div>
+    </div>
+    <div class="voice-bars" id="voiceBars"></div>
+    <div class="voice-status" id="voiceStatus">Listening...</div>
+    <div class="voice-text" id="voiceText"></div>
+  </div>
+
+  <div class="menu-backdrop" id="menuBackdrop"></div>
+
+  <aside class="side-menu" id="sideMenu">
+    <div class="sm-head">
+      <div>
+        <img src="assets/img/logo.png" alt="Vaelo" class="sm-logo" id="menuLogo">
+        <span class="sm-logo-fb" id="menuLogoFb">Vaelo</span>
+      </div>
+      <button type="button" class="sm-close" id="menuClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="sm-group prominent">
+      <div class="sm-item" id="smAdd">
+        <span class="sm-badge"><i class="fa-solid fa-plus"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Add shortcut</span>
+          <span class="sm-sub">Paste a link, Vaelo does the rest</span>
+        </span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-item" id="smAppearance" style="cursor:default;">
+        <span class="sm-badge"><i class="fa-solid fa-circle-half-stroke"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Appearance</span>
+          <span class="sm-sub" id="smAppearanceSub">Follows your system</span>
+        </span>
+      </div>
+      <div class="sm-seg-row">
+        <div class="seg" id="themeSeg">
+          <button type="button" data-theme="system"><i class="fa-solid fa-mobile-screen"></i>System</button>
+          <button type="button" data-theme="light"><i class="fa-solid fa-sun"></i>Light</button>
+          <button type="button" data-theme="dark"><i class="fa-solid fa-moon"></i>Dark</button>
+        </div>
+      </div>
+      <div class="sm-item" id="smTheme">
+        <span class="sm-badge"><i class="fa-solid fa-palette"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Background</span>
+          <span class="sm-sub" id="smThemeSub">Default</span>
+        </span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-item" id="smEngine">
+        <span class="sm-badge" id="smEngineBadge">G</span>
+        <span class="sm-text">
+          <span class="sm-title">Search engine</span>
+          <span class="sm-sub" id="smEngineSub">Google</span>
+        </span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+      <div class="sm-item" id="smPause">
+        <span class="sm-badge"><i class="fa-solid fa-eye-slash"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Pause history</span>
+          <span class="sm-sub">Don't save new searches</span>
+        </span>
+        <div class="toggle" id="togPause"></div>
+      </div>
+      <div class="sm-item" id="smSuggest">
+        <span class="sm-badge"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Live suggestions</span>
+          <span class="sm-sub">Suggest as you type</span>
+        </span>
+        <div class="toggle" id="togSuggest"></div>
+      </div>
+      <div class="sm-item" id="smClear">
+        <span class="sm-badge warn"><i class="fa-solid fa-trash-can"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Clear search history</span>
+          <span class="sm-sub" id="smClearSub">No searches saved</span>
+        </span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-item" id="smReset">
+        <span class="sm-badge"><i class="fa-solid fa-rotate-left"></i></span>
+        <span class="sm-text">
+          <span class="sm-title">Reset shortcuts</span>
+          <span class="sm-sub">Restore the default tiles</span>
+        </span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+    </div>
+
+    <div class="sm-group">
+      <div class="sm-item" id="smDeveloper">
+        <span class="sm-badge"><i class="fa-solid fa-code"></i></span>
+        <span class="sm-text"><span class="sm-title">Developer</span></span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+      <div class="sm-item" id="smAbout">
+        <span class="sm-badge"><i class="fa-solid fa-circle-info"></i></span>
+        <span class="sm-text"><span class="sm-title">About</span></span>
+        <i class="fa-solid fa-chevron-right chev"></i>
+      </div>
+    </div>
+
+    <div class="sm-foot" id="smFoot">Vaelo v5.6</div>
+  </aside>
+
+  <div class="overlay" id="editOverlay">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="sheet-title" id="editTitle">Add shortcut</div>
+
+      <label class="field-label" for="fUrl">Link</label>
+      <input type="text" id="fUrl" class="field" placeholder="youtube.com" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="url">
+
+      <div id="editExtra">
+        <label class="field-label" for="fName">Name</label>
+        <input type="text" id="fName" class="field" placeholder="Auto from link" autocomplete="off" spellcheck="false">
+
+        <span class="field-label">Icon</span>
+        <div class="icon-edit">
+          <div class="tic" id="editIcon"><span class="ltr" style="background:#1668f7;">?</span></div>
+          <div class="icon-edit-text">
+            <b id="editIconTitle">Automatic</b>
+            <span id="editIconSub">The site's icon is fetched for you</span>
+          </div>
+          <div class="icon-edit-btns">
+            <button type="button" id="editIconPick" aria-label="Choose from gallery"><i class="fa-solid fa-image"></i></button>
+            <button type="button" id="editIconReset" aria-label="Use automatic icon"><i class="fa-solid fa-rotate-left"></i></button>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="editIconFile" accept="image/*" class="hidden">
+
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" id="editCancel">Cancel</button>
+        <button type="button" class="btn btn-main" id="editSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="engineOverlay">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="sheet-title">Search engine<small>Used for searches and the quick action row</small></div>
+      <div class="eng-grid" id="engGrid"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="themeOverlay">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="sheet-title">Background</div>
+
+      <div class="th-section">
+        <span class="field-label">Styles</span>
+        <div class="th-row" id="thStyles"></div>
+      </div>
+
+      <div class="th-section">
+        <span class="field-label">Photos</span>
+        <div class="th-row" id="thPhotos"></div>
+      </div>
+      <input type="file" id="bgFile" accept="image/*" class="hidden">
+
+      <div class="glass-row" id="glassRow">
+        <i class="fa-solid fa-droplet"></i>
+        <input type="range" id="glassSlider" min="0" max="10" step="1" value="5">
+        <span class="glass-val" id="glassVal">5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="devOverlay">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="dev-head">
+        <div class="dev-avatar"><i class="fa-solid fa-code" id="devIcon"></i><img alt="" id="devImg"></div>
+        <div>
+          <div class="dev-name" id="devName">X ZONE BD</div>
+          <div class="dev-role" id="devRole">Android &amp; Web Developer</div>
+        </div>
+      </div>
+      <div class="about-text" id="devText">Vaelo is designed and built by X ZONE BD, an independent developer from Bangladesh focused on fast, private and polished Android apps</div>
+      <div class="dev-links" id="devLinks"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="aboutOverlay">
+    <div class="sheet">
+      <div class="grab"></div>
+      <div class="about-head">
+        <img src="assets/img/logo.png" alt="Vaelo" class="about-img" id="aboutImg">
+        <div class="about-fallback" id="aboutFallback">
+          <div class="about-logo"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="about-title">Vaelo</div>
+        </div>
+        <div class="about-sub" id="aboutSub">Private browsing, your way</div>
+      </div>
+      <div class="about-text">
+        Vaelo is a privacy-first browser that controls exactly what every website can learn about your device. Spoof your identity, block trackers, and browse without leaving a fingerprint.
+      </div>
+      <div class="about-feature"><i class="fa-solid fa-user-secret"></i><div><b>Device spoofing</b><span>Send fake or edited device, screen, GPU and locale data</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-shield-halved"></i><div><b>Permission control</b><span>Decide per site what to share: real, fake, or blocked</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-ban"></i><div><b>Ad and tracker blocking</b><span>Blocks over 73,000 known ad, tracker and scam domains</span></div></div>
+      <div class="about-feature"><i class="fa-solid fa-fingerprint"></i><div><b>Anti-fingerprint</b><span>Canvas, WebGL and WebRTC protection built in</span></div></div>
+    </div>
+  </div>
+
+  <div class="overlay center" id="confirmOverlay">
+    <div class="confirm">
+      <div class="confirm-ic" id="confirmIc"><i class="fa-solid fa-trash"></i></div>
+      <h3 id="confirmTitle">Delete shortcut?</h3>
+      <p id="confirmText">This shortcut will be removed from your home screen</p>
+      <div class="btn-row">
+        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span id="toastText"></span>
+    <button type="button" id="toastAct"></button>
+  </div>
+
+  <script src="assets/script/script.js"></script>
+</body>
+</html>
